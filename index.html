@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ピンポン</title>
+</head>
+
+<body>
+    <button id="button" onclick="gamestart()">ゲームスタート</button>
+    <canvas id="can"></camvas>
+
+        <script>
+            let can = document.getElementById("can");
+            let con = can.getContext("2d");
+
+            let button = document.getElementById("button");
+
+            let Canvas_W = 700;
+            let Canvas_H = 600;
+            can.width = Canvas_W;
+            can.height = Canvas_H;
+            can.style.position = "absolute";
+            can.style.left = 200;
+            can.style.border = "2px solid #000";
+
+            let rr = 25;//ボールの半径
+            let x = 350;//ボールの初期位置
+            let y = 300;//
+            let sp = 5;//ボールのスピード
+            let vx = sp;//
+            let vy = -sp;//
+
+            let board_W = 120;//ボードの大きさ
+            let board_H = 10;
+            let bx = 300;//ボードの初期位置
+            let by = 500;//
+
+            let move = {};//ボードの左右方向
+            let board_S = 10;//ボードのスピード
+
+            let gameover = false;//ゲームオーバーか否か
+
+
+            function gamestart() {
+                time = setInterval(main, 1000 / 60);
+                button.disabled = true;
+                gameover = false;
+
+            }
+
+
+
+            function draw() {
+                con.clearRect(0, 0, Canvas_W, Canvas_H);
+　　　　　　　　　//ボールの表示
+                con.fillStyle = "#000";
+                con.beginPath();
+                con.arc(x, y, rr, 0, 360 * Math.PI / 180, true);
+                con.fill();
+
+                
+
+
+            }
+
+            function draw_board() {
+                //ボードの表示
+                con.fillStyle = "#000";
+                con.fillRect(bx, by, board_W, board_H);
+
+                //ゲームオーバーの表示
+                if (gameover) {
+                    con.font = "40pt MSゴシップ ";
+                    con.fillStyle = "#fff";
+                    con.fillText("GAME OVER", 200, 300);
+                    con.strokeStyle = "#000";
+                    con.strokeText("GAME OVER", 200, 300);
+
+                    //その後
+                    button.disabled = false;
+
+                     x = 350;//ボールの初期位置
+                     y = 300;//
+                     vx = sp;//ボールのスピード
+                     vy = -sp;//
+
+                }
+            }
+
+
+            function update() {
+                x += vx;
+                y += vy;
+
+                //当たり判定(壁に当たった場合)
+                if (x + rr > Canvas_W) vx *= -1;
+                if (x - rr < 0) vx *= -1;
+                //if (y + rr > Canvas_H) vy *= -1;
+                if (y - rr < 0) vy *= -1;
+
+                //ボードに当たった場合
+                if (x > bx && x < bx + board_W &&
+                    y + rr >= by && y + rr <= by + board_H) vy *= -1;
+
+                //落ちた時の処理
+                if ((y - rr) > Canvas_H) {
+                    gameover = true;
+                    if (gameover) clearInterval(time);
+
+                }
+
+            }
+
+            function update_board() {
+                if (move.right && (bx + board_W) < Canvas_W) bx += board_S;
+                if (move.left && bx > 0) bx -= board_S;
+
+
+            }
+
+            function main() {
+
+                update();
+                draw();
+                update_board();
+                draw_board();
+
+            }
+
+
+            document.onkeydown = function () {
+                switch (event.keyCode) {
+                    case 37: move.left = true;
+                        break;
+                    case 39: move.right = true;
+                        break;
+                }
+            }
+            document.onkeyup = function () {
+                switch (event.keyCode) {
+                    case 37: move.left = false;
+                        break;
+                    case 39: move.right = false;
+                        break;
+                }
+            }
+
+
+
+        </script>
+</body>
+
+</html>
